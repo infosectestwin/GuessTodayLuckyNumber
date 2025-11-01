@@ -1,10 +1,9 @@
 from bokeh.plotting import figure, output_file
 from bokeh.io import save, show
-from bokeh.models import ColumnDataSource,HoverTool, Div, Label
+from bokeh.models import ColumnDataSource,HoverTool, Range1d
 from bokeh.transform import linear_cmap
 from bokeh.palettes import Turbo256
-from bokeh.layouts import column
-import random
+from bokeh.layouts import column, grid
 
 class render_history:
 
@@ -20,8 +19,8 @@ class render_history:
                 title="📊 Lucky Number Guess History",
                 x_axis_label="Attempt",
                 y_axis_label="Guessed Number",
-                x_range= (1,self.xmax+1),
-                y_range= (1, self.ymax+1),
+                x_range= Range1d(start =1,end=self.xmax+1),
+                y_range= Range1d(start =1,end= self.ymax+1),
                 toolbar_location=None,
                 background_fill_color="#f9fafc",
             )
@@ -31,6 +30,9 @@ class render_history:
         f.title.text_color = "white"
         f.title.background_fill_color = "blue"
         f.title.text_font_size = "15px"
+        f.axis.axis_label_text_color = "blue"
+        f.axis.axis_label_text_font_size = "15px"
+        f.grid.grid_line_color = None
 
         source = ColumnDataSource(data={
                 "attempt": list(range(1,attempdata+1)),

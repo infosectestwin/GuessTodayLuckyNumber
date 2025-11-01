@@ -28,7 +28,7 @@ st.markdown("<h1 style='text-align: center;'>🎯 What is your today's LUCKY Num
 # --- Initialize session state ---
 # --- Initialize session state ---
 if "lucky_number" not in st.session_state:
-    st.session_state.lucky_number = None
+    st.session_state.lucky_number = 0
 if "attempts" not in st.session_state:
     st.session_state.attempts = 0
 if "ready" not in st.session_state:
@@ -96,27 +96,37 @@ if not st.session_state.start_clicked:
 if st.session_state.ready:
     if not st.session_state.restart:
         st.success("✅ The LUCKY number is ready! Start guessing below 👇")
-        guess = st.number_input("Enter your guess:", min_value=1, max_value=100, step=1,key="guess_input")
+        guess = st.text_input("Enter your guess (1–100):", value='' ,key="guess_input")
         submit_clicked = st.button("Submit Guess", key="submit_button")
         render = render_history(10,100)
         if submit_clicked:
-            st.session_state.attempts += 1
-            if st.session_state.attempts >= 10:
-                st.warning(f"❌ Game over! You have reached the maximum number of attempts!")
-                st.session_state.restart = True
-                time.sleep(1.5)
-                st.rerun()
+            if not guess.strip():
+                st.warning("Please enter a number before submitting.")
             else:
-                st.session_state.guesses.append(guess)
-                if guess < st.session_state.lucky_number:
-                    st.warning("🔻 Too low!")
-                elif guess > st.session_state.lucky_number:
-                    st.info("🔺 Too high!")
-                else:
-                    st.balloons()
-                    st.success(f"🎉 You got it! The number was {st.session_state.lucky_number}. Attempts: {st.session_state.attempts}")
+                try:
+                    guessnumber = int(guess)
+                    if 1 <= guessnumber <= 100:
+                        st.session_state.attempts += 1
+                        if st.session_state.attempts >= 10:
+                            st.warning(f"❌ Game over! You have reached the maximum number of attempts!")
+                            st.session_state.restart = True
+                            time.sleep(1.5)
+                            st.rerun()
+                        else:
+                            st.session_state.guesses.append(guess)
+                            if guessnumber < st.session_state.lucky_number:
+                                st.warning("🔻 Too low!")
+                            elif guessnumber > st.session_state.lucky_number:
+                                st.info("🔺 Too high!")
+                            else:
+                                st.balloons()
+                                st.success(f"🎉 You got it! The number was {st.session_state.lucky_number}. Attempts: {st.session_state.attempts}")
 
-                if len(st.session_state.guesses) > 0:
-                    f = render.generate_history(st.session_state.attempts,st.session_state.guesses)
-                    streamlit_bokeh(f, use_container_width=True, theme="streamlit", key="guess_chart")
+                            if len(st.session_state.guesses) > 0:
+                                f = render.generate_history(st.session_state.attempts,st.session_state.guesses)
+                                streamlit_bokeh(f, use_container_width=True, theme="streamlit", key="guess_chart")
+                    else:
+                        st.warning("Number must be between 1 and 100.")
+                except ValueError:
+                    st.error("Please enter a valid integer.")
 
